@@ -204,7 +204,74 @@ function Details({navigation, route}) {
 
 //Recherche de camions selon une carte
 function Map() {
-	return (<View></View>);
+	const initRegion = {
+		latitude: 45.494321999591,
+		latitudeDelta: 0.07,
+		longitude: -73.7877124556514,
+		longitudeDelta: 0.1
+	};
+
+	const [results, setResults] = useState(undefined);
+	const [currentRegion, setCurrentRegion] = useState({
+		latitude: 45.494321999591,
+		latitudeDelta: 0.07,
+		longitude: -73.7877124556514,
+		longitudeDelta: 0.1});
+	const [isFetching, setIsFetching] = useState(false);
+
+	let corps = <View></View>;
+
+	if (isFetching) {
+		corps = <View></View>;
+	} else {
+		if (results) {
+			console.log(results);
+
+			corps = results.map((obj) => (
+				<MapView.Marker title={obj.name}
+								 coordinate={{
+									 latitude: obj.coordinate.latitude,
+									 longitude: obj.coordinate.longitude
+								 }}></MapView.Marker>
+			));
+		}
+	}
+
+	const fetchData = (request) => {
+		setIsFetching(true);
+
+		//Fetch des informations du camion
+		fetch(request)
+			.then(response => response.json())
+			.then(jsonData => {
+				setResults(jsonData);
+			})
+			.catch(error => {
+				setResults("NON");
+			}).finally(() => {
+			setIsFetching(false);
+		});
+	};
+
+	useEffect(() => {
+		fetchData("http://foodtrack-420kbc.herokuapp.com/trucks/map?" +
+			"latitude=" + currentRegion.latitude +
+			"&latitudeDelta=" + currentRegion.latitudeDelta +
+			"&longitude=" + currentRegion.longitude +
+			"&longitudeDelta=" + currentRegion.longitudeDelta);
+	}, [currentRegion]);
+
+	return (
+		<View>
+			<MapView initialRegion={initRegion}
+					 onRegionChangeComplete={(region) => {
+						 setCurrentRegion(region);
+					 }}
+					 style={styles.mapStyle}>
+				{corps}
+			</MapView>
+		</View>
+	);
 }
 
 const Stack = createStackNavigator();
@@ -238,7 +305,7 @@ export default function App() {
 									  options={({navigation, route}) => ({
 										  headerTitle: "Search",
 										  headerRight: () => <Button onPress={() => navigation.navigate('Map')}
-																	title="Map"/>
+																	 title="Map"/>
 									  })}/>
 						<Stack.Screen name="Details"
 									  component={Details}
@@ -277,5 +344,9 @@ const styles = StyleSheet.create({
 		display: 'flex',
 		justifyContent: 'center',
 		alignItems: 'center',
+	},
+	mapStyle: {
+		width: "100%",
+		height: "100%"
 	},
 });
