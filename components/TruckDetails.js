@@ -2,6 +2,7 @@ import React, {useState, useReducer, useContext, useEffect, createContext} from 
 import {StyleSheet, Text, View, Image, FlatList, Button, TouchableOpacity} from 'react-native';
 import MapView, {Polygon, Polyline, Marker} from 'react-native-maps';
 import StateContext from './Context';
+import Header from "./Header";
 
 const Preview = (props) => {
 	let truck = props.data;
@@ -46,6 +47,7 @@ const TruckDetails = (props) => {
 
 		return (
 			<View style={styles.container}>
+				<Header style={styles.headerContainer} title={truck.name}/>
 				<View style={styles.header}>
 					<Image source={{uri: truck.img}} style={{width: 200, height: 100}}/>
 					<TouchableOpacity
@@ -55,16 +57,16 @@ const TruckDetails = (props) => {
 							style={{width: 50, height: 50}}/>
 					</TouchableOpacity>
 				</View>
-				<Text>Menu</Text>
+				<Text style={styles.title}>Menu</Text>
 				<FlatList contentContainerStyle={{paddingBottom: 80}}
 						  data={table}
 						  keyExtractor={(item) => item.id.toString()}
 						  renderItem={({item}) => {
 							  return (
-								  <View>
-									  <Text>Nom : {item.name}</Text>
-									  <Text>Description : {item.description}</Text>
-									  <Text>Prix : {item.price} $</Text>
+								  <View style={styles.textContainer}>
+									  <Text style={styles.label}>Nom : </Text><Text>{item.name}</Text>
+									  <Text style={styles.label}>Description : </Text><Text>{item.description}</Text>
+									  <Text style={styles.label}>Prix :</Text><Text>{item.price} $</Text>
 								  </View>
 							  )
 						  }}
@@ -75,7 +77,7 @@ const TruckDetails = (props) => {
 					longitude: position[0],
 					longitudeDelta: 0.07
 				}} style={styles.mapStyle}>
-					<Marker title="Camion" coordinate={{latitude: position[1], longitude: position[0]}}></Marker>
+					<Marker title={truck.name} coordinate={{latitude: position[1], longitude: position[0]}}></Marker>
 				</MapView>
 			</View>
 		);
@@ -99,5 +101,17 @@ const styles = StyleSheet.create({
 		width: "100%",
 		height: 250,
 	},
+	title: {
+		fontWeight: "bold"
+	},
+	label: {
+		fontStyle: "italic"
+	},
+	textContainer: {
+		borderBottomWidth: 1,
+		borderStyle: "solid",
+		borderColor: "black",
+		padding: 5
+	}
 });
 export default TruckDetails

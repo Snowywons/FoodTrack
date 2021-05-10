@@ -27,7 +27,13 @@ const db = new DB();
 
 const initialState = {
 	isShown: false,
-	favorites: []
+	favorites: [],
+	currentMapPosition: {
+		latitude: 45.50546113926367,
+		latitudeDelta: 0.65,
+		longitude: -73.70574040059736,
+		longitudeDelta: 0.65
+	}
 };
 
 const reducer = (state, action) => {
@@ -74,6 +80,9 @@ const reducer = (state, action) => {
 		case "toggle" :
 			let isShown = !state.isShown;
 			return {...state, isShown: isShown};
+
+		case "mapPosition" :
+			return {...state, currentMapPosition: action.data};
 
 		default:
 			throw new Error(`Action type: ${action.type} is not handled`);
@@ -196,7 +205,6 @@ function Details({navigation, route}) {
 
 	return (
 		<View style={styles.appContainer}>
-			<Header style={styles.headerContainer} title={"Details"}/>
 			{corps}
 		</View>
 	);
@@ -204,19 +212,8 @@ function Details({navigation, route}) {
 
 //Recherche de camions selon une carte
 function Map() {
-	const initRegion = {
-		latitude: 45.494321999591,
-		latitudeDelta: 0.07,
-		longitude: -73.7877124556514,
-		longitudeDelta: 0.1
-	};
-
+	const {state, dispatch} = useContext(StateContext);
 	const [results, setResults] = useState(undefined);
-	const [currentRegion, setCurrentRegion] = useState({
-		latitude: 45.494321999591,
-		latitudeDelta: 0.07,
-		longitude: -73.7877124556514,
-		longitudeDelta: 0.1});
 	const [isFetching, setIsFetching] = useState(false);
 
 	let corps = <View></View>;
@@ -225,14 +222,14 @@ function Map() {
 		corps = <View></View>;
 	} else {
 		if (results) {
-			console.log(results);
-
 			corps = results.map((obj) => (
-				<MapView.Marker title={obj.name}
-								 coordinate={{
-									 latitude: obj.coordinate.latitude,
-									 longitude: obj.coordinate.longitude
-								 }}></MapView.Marker>
+				<MapView.Marker
+					key={obj.id}
+					title={obj.name}
+					coordinate={{
+					latitude: obj.coordinate.latitude,
+					longitude: obj.coordinate.longitude
+				}}></MapView.Marker>
 			));
 		}
 	}
@@ -255,17 +252,17 @@ function Map() {
 
 	useEffect(() => {
 		fetchData("http://foodtrack-420kbc.herokuapp.com/trucks/map?" +
-			"latitude=" + currentRegion.latitude +
-			"&latitudeDelta=" + currentRegion.latitudeDelta +
-			"&longitude=" + currentRegion.longitude +
-			"&longitudeDelta=" + currentRegion.longitudeDelta);
-	}, [currentRegion]);
+			"latitude=" + state.currentMapPosition.latitude +
+			"&latitudeDelta=" + state.currentMapPosition.latitudeDelta +
+			"&longitude=" + state.currentMapPosition.longitude +
+			"&longitudeDelta=" + state.currentMapPosition.longitudeDelta);
+	}, [state.currentMapPosition]);
 
 	return (
 		<View>
-			<MapView initialRegion={initRegion}
+			<MapView initialRegion={state.currentMapPosition}
 					 onRegionChangeComplete={(region) => {
-						 setCurrentRegion(region);
+						 dispatch({type: "mapPosition", data: region})
 					 }}
 					 style={styles.mapStyle}>
 				{corps}
