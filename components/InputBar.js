@@ -1,9 +1,12 @@
-import {Button, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {Button, StyleSheet, Text, TextInput, TouchableOpacity, View, I18nManager} from "react-native";
 import React, {useState} from "react";
+import i18n from "i18n-js";
+
 
 const InputBar = (props) => {
 	const api = "http://foodtrack-420kbc.herokuapp.com/trucks";
 	const [text, setText] = useState("");
+
 
 	return (
 		<View>
@@ -12,14 +15,14 @@ const InputBar = (props) => {
 						   setText(txt)
 					   }}
 					   value={text}
-					   placeholder="Name"/>
+					   placeholder={i18n.t("name")}/>
 
 			<View style={styles.buttonsContainer}>
 				<TouchableOpacity style={styles.resetContainer} onPress={() => {
 					setText("");
 					props.onConfirm(api);
 				}}>
-					<Text style={styles.resetText}>RESET</Text>
+					<Text style={styles.resetText}>{i18n.t("reset")}</Text>
 				</TouchableOpacity>
 
 				<TouchableOpacity style={styles.confirmContainer} onPress={() => {
@@ -29,7 +32,7 @@ const InputBar = (props) => {
 					else
 						props.onConfirm(api);
 				}}>
-					<Text style={styles.confirmText}>CONFIRM</Text>
+					<Text style={styles.confirmText}>{i18n.t("confirm")}</Text>
 				</TouchableOpacity>
 			</View>
 		</View>
@@ -62,7 +65,7 @@ const styles = StyleSheet.create({
 	confirmContainer: {
 		width: '40%',
 		flex: 1,
-		backgroundColor: 'yellow',
+		backgroundColor: 'gold',
 		color: 'white',
 		textAlign: 'center',
 		justifyContent: 'center',

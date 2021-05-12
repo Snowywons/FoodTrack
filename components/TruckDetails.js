@@ -1,20 +1,20 @@
 import React, {useState, useReducer, useContext, useEffect, createContext} from 'react';
-import {StyleSheet, Text, View, Image, FlatList, Button, TouchableOpacity} from 'react-native';
+import {StyleSheet, Text, View, Image, FlatList, Button, TouchableOpacity, I18nManager} from 'react-native';
 import MapView, {Polygon, Polyline, Marker} from 'react-native-maps';
 import StateContext from './Context';
 import Header from "./Header";
+import i18n from "i18n-js";
 
 const Preview = (props) => {
 	let truck = props.data;
 	return (
 		<View style={styles.detailsContainers}>
 			<Image source={{uri: truck.img}} style={{width: 200, height: 100}}/>
-			<Text>Nom: {truck.name}</Text>
-			<Text>Style: {truck.type}</Text>
+			<Text>{i18n.t("name")} {truck.name}</Text>
+			<Text>{i18n.t("style")}{truck.type}</Text>
 		</View>
 	);
 };
-
 const TruckDetails = (props) => {
 	const {state, dispatch} = useContext(StateContext);
 
@@ -64,9 +64,9 @@ const TruckDetails = (props) => {
 						  renderItem={({item}) => {
 							  return (
 								  <View style={styles.textContainer}>
-									  <Text style={styles.label}>Nom : </Text><Text>{item.name}</Text>
-									  <Text style={styles.label}>Description : </Text><Text>{item.description}</Text>
-									  <Text style={styles.label}>Prix :</Text><Text>{item.price} $</Text>
+									  <Text style={styles.label}>{i18n.t("name")}: </Text><Text>{item.name}</Text>
+									  <Text style={styles.label}>{i18n.t("description")}: </Text><Text>{item.description}</Text>
+									  <Text style={styles.label}>{i18n.t("price")}: </Text><Text>{item.price} $</Text>
 								  </View>
 							  )
 						  }}

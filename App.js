@@ -8,9 +8,11 @@ import {
 	Dimensions,
 	Button,
 	ActivityIndicator,
-	TouchableOpacity
+	TouchableOpacity,
+	I18nManager
 } from 'react-native';
 import MapView, {Polygon, Polyline, Marker} from 'react-native-maps';
+import i18n from 'i18n-js';
 
 import {NavigationContainer, useNavigation} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
@@ -33,9 +35,42 @@ const initialState = {
 		latitudeDelta: 0.65,
 		longitude: -73.70574040059736,
 		longitudeDelta: 0.65
-	}
+	}, 
+	localeChanged:false
 };
-
+i18n.locale = "fr-CA";
+i18n.translations["fr-CA"] ={
+	"trucks":"Camions",
+	"hideFave":"Cacher les favoris",
+	"showFave":"Afficher les favoris",
+	"search":"Recherche",
+	"details":"Détails",
+	"map":"Carte",
+	"back":"Retour",
+	"name":"Nom",
+	"style":"Style",
+	"confirm":"Confirmer",
+	"reset":"Réinitialiser",
+	"description":"Description",
+	"price": "Prix",
+	"lang":"EN"
+}
+i18n.translations["en-CA"]={
+	"trucks":"Trucks",
+	"hideFave":"Hide favorites",
+	"showFave":"Show favorites",
+	"search":"Search",
+	"details":"Details",
+	"map":"Map",
+	"back":"Back",
+	"name":"Name",
+	"style":"Style",
+	"confirm":"Confirm",
+	"reset":"Reset",
+	"description":"Description",
+	"price":"Price",
+	"lang":"FR"
+}
 const reducer = (state, action) => {
 	switch (action.type) {
 		case "initialStateUpdate" :
@@ -83,6 +118,9 @@ const reducer = (state, action) => {
 
 		case "mapPosition" :
 			return {...state, currentMapPosition: action.data};
+			
+		case "toggleLang" :
+			return {...state, localeChanged: !state.localeChanged};
 
 		default:
 			throw new Error(`Action type: ${action.type} is not handled`);
@@ -94,8 +132,9 @@ function Search({navigation, route}) {
 	const {state, dispatch} = useContext(StateContext);
 	const [results, setResults] = useState({});
 	const [isFetching, setIsFetching] = useState(false);
+	const [localeChanged, setLocaleChanged] = useState(false);
 
-	let favoriteTitle = state.isShown ? "Hide favorites" : "Show favorites";
+	let favoriteTitle = state.isShown ? i18n.t("hideFave"): i18n.t("showFave");
 
 	let content;
 
@@ -134,7 +173,7 @@ function Search({navigation, route}) {
 
 	return (
 		<View style={styles.appContainer}>
-			<Header style={styles.headerContainer} title={"Trucks"}/>
+			<Header style={styles.headerContainer} title={i18n.t("trucks")}/>
 			<InputBar onConfirm={(api) => fetchData(api)}/>
 
 			{content}
@@ -276,6 +315,7 @@ const Stack = createStackNavigator();
 export default function App() {
 	const [state, dispatch] = useReducer(reducer, initialState);
 
+
 	const initialStateUpdate = () => {
 		db.db.transaction(tx => {
 			tx.executeSql("SELECT * FROM Favorites", [], (_, result) => {
@@ -300,23 +340,23 @@ export default function App() {
 						<Stack.Screen name="Search"
 									  component={Search}
 									  options={({navigation, route}) => ({
-										  headerTitle: "Search",
+										  headerTitle: i18n.t("search"),
 										  headerRight: () => <Button onPress={() => navigation.navigate('Map')}
-																	 title="Map"/>
+																	 title={i18n.t("map")}/>
 									  })}/>
 						<Stack.Screen name="Details"
 									  component={Details}
 									  options={({navigation, route}) => ({
-										  headerTitle: "Details",
+										  headerTitle: i18n.t("details"),
 										  headerLeft: () => <Button onPress={() => navigation.navigate('Search')}
-																	title="Back"/>
+																	title={i18n.t("back")}/>
 									  })}/>
 						<Stack.Screen name="Map"
 									  component={Map}
 									  options={({navigation, route}) => ({
-										  headerTitle: "Map",
+										  headerTitle: i18n.t("map"),
 										  headerLeft: () => <Button onPress={() => navigation.navigate('Search')}
-																	title="Back"/>
+																	title={i18n.t("back")}/>
 									  })}/>
 					</Stack.Navigator>
 				</NavigationContainer>

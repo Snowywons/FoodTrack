@@ -1,15 +1,16 @@
-import React, {useState, useReducer, useContext, useEffect, createContext} from 'react';
+import React, {useState, useReducer, useContext, useEffect, createContext, i18nManager} from 'react';
 import {StyleSheet, Text, View, Image, FlatList, TouchableOpacity} from 'react-native';
 import {useNavigation} from "@react-navigation/native";
 import StateContext from './Context';
+import i18n from "i18n-js";
 
 const Preview = (props) => {
 	let truck = props.data;
 	return (
 		<View style={styles.detailsContainers}>
 			<Image source={{uri: truck.img}} style={{width: 200, height: 100}}/>
-			<Text>Nom: {truck.name}</Text>
-			<Text>Style: {truck.type}</Text>
+			<Text>{i18n.t("name")}: {truck.name}</Text>
+			<Text>{i18n.t("style")}: {truck.type}</Text>
 		</View>
 	);
 };
